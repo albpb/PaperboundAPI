@@ -23,6 +23,8 @@ public partial class PaperboundContext : DbContext
 
     public virtual DbSet<PuntRecollida> PuntsRecollida { get; set; }
 
+    public virtual DbSet<Qr> Qrs { get; set; }
+
     public virtual DbSet<Qrcode> Qrcodes { get; set; }
 
     public virtual DbSet<Usuari> Usuaris { get; set; }
@@ -56,14 +58,14 @@ public partial class PaperboundContext : DbContext
             entity.HasKey(e => e.IdGenere).HasName("PK__Generes__85223DD5F7B8DA95");
 
             entity.Property(e => e.IdGenere).HasColumnName("idGenere");
+            entity.Property(e => e.ImgGenere)
+                .HasMaxLength(4000)
+                .IsUnicode(false)
+                .HasColumnName("imgGenere");
             entity.Property(e => e.NomGenere)
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("nomGenere");
-            entity.Property(e => e.imgGenere)
-                .HasMaxLength(4000)
-                .IsUnicode(false)
-                .HasColumnName("imgGenere");
         });
 
         modelBuilder.Entity<Llibre>(entity =>
@@ -130,6 +132,33 @@ public partial class PaperboundContext : DbContext
                 .HasMaxLength(256)
                 .IsUnicode(false)
                 .HasColumnName("longitud");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("nombre");
+        });
+
+        modelBuilder.Entity<Qr>(entity =>
+        {
+            entity.HasKey(e => e.IdQr).HasName("pk_qr");
+
+            entity.ToTable("qr");
+
+            entity.Property(e => e.IdQr).HasColumnName("idQr");
+            entity.Property(e => e.Code)
+                .HasMaxLength(4000)
+                .IsUnicode(false)
+                .HasColumnName("code");
+            entity.Property(e => e.IdLlibre).HasColumnName("idLlibre");
+            entity.Property(e => e.IdPuntRecollida).HasColumnName("idPuntRecollida");
+
+            entity.HasOne(d => d.IdLlibreNavigation).WithMany(p => p.Qrs)
+                .HasForeignKey(d => d.IdLlibre)
+                .HasConstraintName("fk_qrbook");
+
+            entity.HasOne(d => d.IdPuntRecollidaNavigation).WithMany(p => p.Qrs)
+                .HasForeignKey(d => d.IdPuntRecollida)
+                .HasConstraintName("fk_qrpointstore");
         });
 
         modelBuilder.Entity<Qrcode>(entity =>

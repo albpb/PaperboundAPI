@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PaperboundAPI.Models;
+using PaperboundAPI.Resources;
 
 namespace PaperboundAPI.Controllers
 {
@@ -77,6 +80,61 @@ namespace PaperboundAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Usuari>> PostUsuari(Usuari usuari)
         {
+            _context.Usuaris.Add(usuari);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetUsuari", new { id = usuari.IdUser }, usuari);
+        }
+        [HttpPost("Login")]
+        public async Task<bool> Login(LoginResource login)
+        {
+            List<Usuari> usuariComparar = _context.Usuaris.Where(x => x.Login == login.User).ToList();
+            bool esCorrecto = false;
+
+            for (int i = 0; i < usuariComparar.Count && !esCorrecto; i++)
+            {
+                Usuari temp = usuariComparar[i];
+
+                using (SHA256 hash = SHA256.Create())
+                {
+                    byte[] hashedBytes = hash.ComputeHash(Encoding.UTF8.GetBytes(login.Password + temp.Salt));
+                    string password = BitConverter.ToString(hashedBytes);
+
+                    if (password == temp.Password)
+                    {
+                        esCorrecto = true;
+                    }
+                }
+            }
+
+            return esCorrecto;
+        }
+        [HttpPost("Register")]
+        public async Task<ActionResult<Usuari>> Register(LoginResource login)
+        {
+            string saltHashed;
+            string contrasenya;
+
+            Random random = new Random();
+
+            int saltBF = random.Next();
+
+            using (SHA256 hash = SHA256.Create())
+            {
+                byte[] hashedBytes = hash.ComputeHash(Encoding.UTF8.GetBytes(saltBF.ToString()));
+                saltHashed = BitConverter.ToString(hashedBytes);
+
+                byte[] hashedBytes2 = hash.ComputeHash(Encoding.UTF8.GetBytes(login.Password + saltHashed));
+                contrasenya = BitConverter.ToString(hashedBytes2);
+
+            }
+            Usuari usuari = new Usuari
+            {
+                Login = login.User,
+                Password = contrasenya,
+                Salt = saltHashed,
+            };
+
             _context.Usuaris.Add(usuari);
             await _context.SaveChangesAsync();
 

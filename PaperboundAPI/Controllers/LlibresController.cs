@@ -31,7 +31,7 @@ namespace PaperboundAPI.Controllers
         [HttpGet("{genreName}")]
         public async Task<ActionResult<IEnumerable<Llibre>>> GetLlibres(string genreName)
         {
-            var genere = await _context.Generes.FirstOrDefaultAsync(x => x.NomGenere == genreName);
+            Genere genere = await _context.Generes.FirstOrDefaultAsync(x => x.NomGenere == genreName);
 
             var llibre = await _context.Llibres.Where(x => x.IdGenere == genere.IdGenere).ToListAsync();
 
@@ -41,6 +41,23 @@ namespace PaperboundAPI.Controllers
             }
 
             return llibre;
+        }
+        //// GET: api/Llibres/NombredelLibro
+        [HttpGet("getByBookName")]
+        public async Task<ActionResult<IEnumerable<Llibre>>> GetByTitol(string genreName, string bookName)
+        {
+            Genere genere = await _context.Generes.FirstOrDefaultAsync(x => x.NomGenere == genreName);
+
+            List<Llibre> llibre = await _context.Llibres.Where(x => x.IdGenere == genere.IdGenere).ToListAsync();
+
+            var llibrefinal = llibre.Where(x => x.Titol.ToUpper().Contains(bookName.ToUpper())).ToList();
+
+            if (llibrefinal == null)
+            {
+                return NotFound();
+            }
+
+            return llibrefinal;
         }
 
         // GET: api/Llibres/5

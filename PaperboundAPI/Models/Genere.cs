@@ -9,7 +9,7 @@ public partial class Genere
 
     public string? NomGenere { get; set; }
 
-    public string? imgGenere { get; set; }
+    public string? ImgGenere { get; set; }
 
     public virtual ICollection<Llibre> Llibres { get; } = new List<Llibre>();
 }

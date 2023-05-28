@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace PaperboundAPI.Models;
 
@@ -21,8 +20,10 @@ public partial class Llibre
     public string? UrlImatge { get; set; }
 
     public decimal? PreuTotal { get; set; }
-    [JsonIgnore]
+
     public virtual Genere? IdGenereNavigation { get; set; }
+
+    public virtual ICollection<Qr> Qrs { get; } = new List<Qr>();
 
     public virtual ICollection<Comanda> IdComandes { get; } = new List<Comanda>();
 }

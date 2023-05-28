@@ -9,5 +9,5 @@ public partial class Qrcode
 
     public int? IdComanda { get; set; }
 
-    public virtual Comanda? IdComandaNavigation { get; set; }
+    public virtual Comanda  ? IdComandaNavigation { get; set; }
 }

@@ -11,5 +11,9 @@ public partial class PuntRecollida
 
     public string? Longitud { get; set; }
 
+    public string? Nombre { get; set; }
+
     public virtual ICollection<Comanda> Comandes { get; } = new List<Comanda>();
+
+    public virtual ICollection<Qr> Qrs { get; } = new List<Qr>();
 }
